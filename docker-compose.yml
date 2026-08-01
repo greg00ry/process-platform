@@ -19,7 +19,7 @@ services:
     ports:
       - "8089:8080"
     volumes:
-      - ./src/main/resources/wiremock:/home/wiremock
+      - ./operaton/src/main/resources/wiremock:/home/wiremock
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/__admin/mappings"]
       interval: 5s
@@ -47,3 +47,47 @@ services:
       - "1025:1025"
       - "8025:8025"
     restart: unless-stopped
+
+  htmx:
+    build: ./htmx
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      CORS_ORIGIN: "*"
+
+  operaton:
+    build: ./operaton
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/operaton
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: 1025
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      CREDIT_SCORE_SERVICE_URL: http://wiremock:8080
+      ECM_ADAPTER_URL: http://ecm-adapter:8090
+    depends_on:
+      postgres:
+        condition: service_healthy
+      wiremock:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  ecm-adapter:
+    build: ./ecm-adapter
+    ports:
+      - "8090:8090"
+    environment:
+      ECM_BASE_URL: http://operaton:8080
+      ADAPTER_ADDR: ":8090"
+      KAFKA_BROKERS: kafka:9092
+      ECM_EVENTS_TOPIC: ecm.document.events
+    depends_on:
+      kafka:
+        condition: service_healthy
+      operaton:
+        condition: service_started

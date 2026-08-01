@@ -59,31 +59,42 @@ If the DMN decision returns `high`, the process skips the user task completely a
 ## Prerequisites
 
 - Java 21+
-- Docker (for PostgreSQL, WireMock, and Mailpit)
+- Docker (for PostgreSQL, WireMock, Kafka, and Mailpit)
 - Maven wrapper included (`./mvnw`) or Gradle wrapper (`./gradlew`)
 
 ## Run It
 
+This service is part of the `process-platform` monorepo; `docker-compose.yml` lives at the repo root, one level up from this directory.
+
 ### 1. Start dependencies
 
 ```bash
-docker compose up -d
+# from the repo root
+docker compose up -d postgres wiremock kafka mailpit
 ```
 
 Services started:
 - PostgreSQL on port 5432 (credentials: operaton/operaton)
 - WireMock on port 8089 (credit-score stub)
+- Kafka on port 9092 (document events)
 - Mailpit SMTP on port 1025 / Web UI on port 8025
 
 ### 2. Run the application
 
 ```bash
+# from operaton/
 # Make wrappers executable on macOS/Linux
 chmod +x mvnw gradlew
 
 ./mvnw spring-boot:run
 # or
 ./gradlew bootRun
+```
+
+Alternatively, run the whole platform (including this service and `ecm-adapter`) containerized from the repo root:
+
+```bash
+docker compose up -d --build
 ```
 
 ### 3. Open the web apps

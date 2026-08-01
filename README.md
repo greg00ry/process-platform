@@ -11,7 +11,7 @@ przeglądarka (dowolny CMS/frontend)
       │  hx-get "/widget/formio/:schemaId"
       ▼
 ┌────────────────────┐        ┌──────────┐        ┌──────────────────────┐        ┌───────────────┐
-│  htmx/              │  Kafka  │  Kafka   │        │  loan-application/    │  Kafka  │  ecm-adapter/  │
+│  htmx/              │  Kafka  │  Kafka   │        │  operaton/            │  Kafka  │  ecm-adapter/  │
 │  Node/Express BFF    │──────► │  (event  │───────►│  Spring Boot +        │──────► │  Go            │
 │  form.io widget       │        │   bus)   │        │  Operaton (BPMN/DMN)  │        │  konsumuje     │
 └────────────────────┘        └──────────┘        └──────────────────────┘        │  zdarzenia,    │
@@ -23,15 +23,27 @@ Formularz (widget) nigdy nie woła silnika procesowego ani ECM bezpośrednio —
 
 ## Komponenty
 
+Każdy mikroserwis ma własny top-level folder w monorepo:
+
 | Katalog | Co to jest | Stack |
 |---|---|---|
 | [`htmx/`](htmx/README.md) | BFF renderujący formularze schema-driven (form.io), osadzany przez htmx w dowolnym frontendzie | Node.js, TypeScript, Express |
-| [`loan-application/`](loan-application/README.md) | Silnik procesu: triage wniosku kredytowego (credit-score, DMN, routing przez BPMN, human task dla underwritera) | Java 21, Spring Boot, Operaton (BPMN/DMN) |
-| [`loan-application/ecm-adapter/`](loan-application/ecm-adapter) | Mikroserwis konsumujący zdarzenia dokumentowe z Kafki i przekazujący je do ECM | Go |
+| [`operaton/`](operaton/README.md) | Silnik procesu: triage wniosku kredytowego (credit-score, DMN, routing przez BPMN, human task dla underwritera) | Java 21, Spring Boot, Operaton (BPMN/DMN) |
+| [`ecm-adapter/`](ecm-adapter) | Mikroserwis konsumujący zdarzenia dokumentowe z Kafki i przekazujący je do ECM | Go |
 
 ## Uruchomienie
 
-Każdy komponent ma własne instrukcje w swoim README. W skrócie:
+### Cała platforma naraz (Docker Compose)
+
+```bash
+docker compose up -d --build
+```
+
+Odpala infrastrukturę (Postgres, WireMock, Kafka, Mailpit) i wszystkie trzy mikroserwisy — `htmx` (:3000), `operaton` (:8080), `ecm-adapter` (:8090).
+
+### Pojedynczy komponent lokalnie
+
+Każdy komponent ma też własne instrukcje w swoim README. W skrócie:
 
 ```bash
 # widget formularzy
@@ -39,9 +51,8 @@ cd htmx
 npm install
 npm start
 
-# proces BPMN + zależności (Postgres, WireMock, Kafka, Mailpit)
-cd loan-application
-docker compose up -d
+# proces BPMN (wymaga docker compose up -d postgres wiremock kafka mailpit z roota)
+cd operaton
 ./mvnw spring-boot:run
 ```
 

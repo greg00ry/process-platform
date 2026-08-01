@@ -5,15 +5,15 @@ dist/
 *.tsbuildinfo
 npm-debug.log*
 
-# Java / Maven / Gradle (loan-application/)
+# Java / Maven / Gradle (operaton/)
 target/
 .gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
-# Go (loan-application/ecm-adapter/)
-loan-application/ecm-adapter/ecm-adapter
-loan-application/ecm-adapter/*.exe
+# Go (ecm-adapter/)
+ecm-adapter/ecm-adapter
+ecm-adapter/*.exe
 
 # IDE
 .idea/

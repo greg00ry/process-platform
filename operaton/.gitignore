@@ -6,10 +6,6 @@ target/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
-# Go
-ecm-adapter/ecm-adapter
-ecm-adapter/*.exe
-
 # IDE
 .idea/
 *.iml
