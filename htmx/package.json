@@ -1,0 +1,27 @@
+{
+  "name": "form-backend",
+  "version": "1.0.0",
+  "description": "Prosty backend Node.js/Express hostujacy formularz i zapisujacy zgloszenia do pliku",
+  "main": "server.ts",
+  "type": "commonjs",
+  "scripts": {
+    "start": "tsx server.ts",
+    "dev": "tsx watch server.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@formio/js": "^5.5.0",
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.13.1",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.6.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.1",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2"
+  }
+}

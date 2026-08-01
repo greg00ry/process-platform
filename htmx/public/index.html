@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Przyjęcie dokumentu (demo osadzenia)</title>
+<script src="/htmx.min.js"></script>
+</head>
+<body style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 4rem auto; padding: 0 1.5rem;">
+  <h1>Przyjęcie dokumentu</h1>
+  <p><em>To jest dokładnie ten kod, który wkleja się w edytor HTML dowolnego frontendu/CMS-a
+  (Drupal, Webflow, statyczny HTML...). Formularz jest renderowany z JSON-schema (@formio/js)
+  — nowy typ dokumentu to nowy plik w <code>data/forms-formio/</code>, bez zmian w kodzie.
+  Zarządzanie formularzami: <a href="/admin/forms">/admin/forms</a>.</em></p>
+
+  <div hx-get="/widget/formio/document-intake" hx-trigger="load" hx-swap="outerHTML">
+    Ładowanie formularza...
+  </div>
+</body>
+</html>

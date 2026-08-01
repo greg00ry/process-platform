@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dmn:definitions xmlns:dmn="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:operaton="http://operaton.org/schema/1.0/dmn" id="risk-assessment-definitions" name="Risk Assessment" namespace="http://operaton.org/examples">
+
+  <dmn:decision id="risk-assessment" name="Risk Assessment" operaton:historyTimeToLive="30">
+    <dmn:decisionTable id="decisionTable_1" hitPolicy="FIRST">
+      <dmn:input id="input_creditScore" label="Credit Score">
+        <dmn:inputExpression id="inputExpression_creditScore" typeRef="integer">
+          <dmn:text>creditScore</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:input id="input_loanAmount" label="Loan Amount">
+        <dmn:inputExpression id="inputExpression_loanAmount" typeRef="integer">
+          <dmn:text>loanAmount</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:output id="output_riskLevel" label="Risk Level" name="riskLevel" typeRef="string" />
+
+      
+      <dmn:rule id="rule_low">
+        <dmn:inputEntry id="inputEntry_low_credit"><dmn:text>&gt;= 700</dmn:text></dmn:inputEntry>
+        <dmn:inputEntry id="inputEntry_low_loan"><dmn:text>&lt;= 500000</dmn:text></dmn:inputEntry>
+        <dmn:outputEntry id="outputEntry_low"><dmn:text>"low"</dmn:text></dmn:outputEntry>
+      </dmn:rule>
+
+      
+      <dmn:rule id="rule_medium">
+        <dmn:inputEntry id="inputEntry_medium_credit"><dmn:text>[600..699]</dmn:text></dmn:inputEntry>
+        <dmn:inputEntry id="inputEntry_medium_loan"><dmn:text>&lt;= 500000</dmn:text></dmn:inputEntry>
+        <dmn:outputEntry id="outputEntry_medium"><dmn:text>"medium"</dmn:text></dmn:outputEntry>
+      </dmn:rule>
+
+      
+      <dmn:rule id="rule_high">
+        <dmn:inputEntry id="inputEntry_high_credit"><dmn:text>&lt; 600</dmn:text></dmn:inputEntry>
+        <dmn:inputEntry id="inputEntry_high_loan"><dmn:text /></dmn:inputEntry>
+        <dmn:outputEntry id="outputEntry_high"><dmn:text>"high"</dmn:text></dmn:outputEntry>
+      </dmn:rule>
+
+    </dmn:decisionTable>
+  </dmn:decision>
+
+</dmn:definitions>

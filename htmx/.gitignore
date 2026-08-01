@@ -1,0 +1,16 @@
+node_modules/
+data/submissions.json
+dist/
+*.tsbuildinfo
+
+# logi
+npm-debug.log*
+*.log
+
+# sekrety/konfiguracja lokalna
+.env
+.env.local
+
+# system/edytor
+.DS_Store
+.vscode/

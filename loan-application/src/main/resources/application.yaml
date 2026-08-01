@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: loan-application
+  datasource:
+    url: jdbc:postgresql://localhost:5432/operaton
+    username: operaton
+    password: operaton
+  mail:
+    host: localhost
+    port: 1025
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  kafka:
+    bootstrap-servers: localhost:9092
+
+ecm:
+  events:
+    topic: ecm.document.events
+  adapter:
+    url: http://localhost:8090
+
+credit:
+  score:
+    service:
+      url: http://localhost:8089
+
+operaton:
+  bpm:
+    admin-user:
+      id: demo
+      password: demo
+      first-name: Demo
+    filter:
+      create: All tasks

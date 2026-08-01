@@ -1,0 +1,58 @@
+{
+  "components": [
+    {
+      "type": "textfield",
+      "key": "title",
+      "label": "Tytuł dokumentu",
+      "input": true,
+      "validate": {
+        "required": true
+      },
+      "tableView": true
+    },
+    {
+      "type": "select",
+      "key": "documentType",
+      "label": "Typ dokumentu",
+      "input": true,
+      "data": {
+        "values": [
+          {
+            "label": "Wniosek",
+            "value": "wniosek"
+          },
+          {
+            "label": "Pismo ogólne",
+            "value": "pismo_ogolne"
+          },
+          {
+            "label": "Skarga",
+            "value": "skarga"
+          }
+        ]
+      },
+      "validate": {
+        "required": true
+      },
+      "tableView": true
+    },
+    {
+      "type": "textarea",
+      "key": "description",
+      "label": "Opis / treść",
+      "input": true,
+      "validate": {
+        "required": true
+      },
+      "tableView": true
+    },
+    {
+      "type": "button",
+      "key": "submit",
+      "label": "Wyślij",
+      "input": true,
+      "tableView": false,
+      "disableOnInvalid": true
+    }
+  ]
+}

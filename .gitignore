@@ -1,0 +1,31 @@
+# Node (htmx/)
+node_modules/
+htmx/data/submissions.json
+dist/
+*.tsbuildinfo
+npm-debug.log*
+
+# Java / Maven / Gradle (loan-application/)
+target/
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Go (loan-application/ecm-adapter/)
+loan-application/ecm-adapter/ecm-adapter
+loan-application/ecm-adapter/*.exe
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+
+# Env / secrets
+.env
+.env.local
+
+# Logs
+*.log
