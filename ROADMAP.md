@@ -41,6 +41,11 @@ Checklista rzeczy, które faktycznie odróżniają projekt "senior" od demo z ł
   - **Mermaid C4** (`C4Context`/`C4Container`) — najlżejsze, renderuje się natywnie w GitHub markdown, ale mniej możliwości niż DSL-owe narzędzia.
   - Kierunek: prawdopodobnie Structurizr Lite lub LikeC4, żeby diagram żył jako kod w repo i aktualizował się razem z architekturą, nie ręcznie w README.
 
+## Workery / logika procesów (pomysły do rozważenia, nie decyzja)
+
+- [ ] **n8n** jako warstwa integracji dla prostych workerów (self-hosted, wywoływany przez `operaton` przez HTTP service task). Watpliwość własna: i tak trzeba pisać kod dla logiki specyficznej dla domeny, więc realna wartość niejasna — do rozpatrzenia, nie do wdrożenia bez przemyślenia.
+- [ ] Wbudowany w `admin/` edytor kodu dla workerów (np. Monaco/CodeMirror) + code quality gate (Checkstyle dla Javy albo odpowiednik) — pomysł: pisanie/edycja logiki workera bezpośrednio w platformie, z linterem pilnującym jakości, zamiast pełnego IDE na boku.
+
 ## Status
 
 `admin` (Refine) gotowy: CRUD na schematach formularzy + linki do Cockpit/Tasklist. Punkty powyżej wciąż otwarte — to następny przystanek.
