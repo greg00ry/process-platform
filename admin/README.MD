@@ -1,48 +1,40 @@
-# admin
+# admin (panel Refine)
 
-<div align="center" style="margin: 30px;">
-    <a href="https://refine.dev">
-    <img alt="refine logo" src="https://refine.ams3.cdn.digitaloceanspaces.com/readme/refine-readme-banner.png">
-    </a>
-</div>
-<br/>
+Wewnętrzny panel do zarządzania platformą — React + [Refine](https://refine.dev) + Ant Design. To nie jest CMS ani narzędzie dla end-usera; strony, które end user faktycznie widzi, są publikowane pod `/p/:id` (patrz "Strony" niżej), same w sobie bez chrome'u panelu.
 
-This [Refine](https://github.com/refinedev/refine) project was generated with [create refine-app](https://github.com/refinedev/refine/tree/master/packages/create-refine-app).
+## Zasoby
 
-## Getting Started
+| Zasób | Ścieżka | Co robi |
+|---|---|---|
+| Formularze | `/forms` | CRUD schematów form.io. Gada z JSON API `htmx` (`/api/admin/forms*`). Edycja pól przez surowy JSON lub link do wizualnego (drag&drop) buildera hostowanego przez `htmx`. |
+| Strony | `/pages` | Page builder ([Puck](https://puckeditor.com), MIT) do składania ekranów z gotowych komponentów (Heading, Text, Image, Button, Section, Columns, Spacer, Card) + `FormWidget`, który osadza **prawdziwy** widget formularza z `htmx`. Edytor pod `/pages/edit/:id`, publiczny (bez chrome'u panelu) podgląd pod `/p/:id`. |
 
-A React Framework for building internal tools, admin panels, dashboards & B2B apps with unmatched flexibility ✨
+Header linkuje też (nowa karta) do gotowych webappek Operatona — Cockpit i Tasklist — zamiast je odtwarzać.
 
-Refine's hooks and components simplifies the development process and eliminates the repetitive tasks by providing industry-standard solutions for crucial aspects of a project, including authentication, access control, routing, networking, state management, and i18n.
-
-## Available Scripts
-
-### Running the development server.
+## Uruchomienie
 
 ```bash
-    npm run dev
+npm install
+npm run dev      # vite dev server, domyślnie :5173
+npm run build    # tsc + vite build
 ```
 
-### Building for production.
+### Zmienne środowiskowe
 
-```bash
-    npm run build
-```
+`.env` (lokalnie) / `ARG`+`ENV` w `Dockerfile` (kontener):
 
-### Running the production server.
+| Zmienna | Domyślnie | Do czego |
+|---|---|---|
+| `VITE_API_URL` | `http://localhost:3000/api` | Data provider (`htmx`'s `/api/admin/*`) |
+| `VITE_WIDGET_BASE_URL` | `http://localhost:3000` | Link do widgetu/buildera formularzy, iframe `FormWidget` w Pucku |
+| `VITE_OPERATON_BASE_URL` | `http://localhost:8080` | Linki do Cockpit/Tasklist |
 
-```bash
-    npm run start
-```
+**Ważne:** to Vite/SPA — te zmienne są wpiekane w bundle przy buildzie i muszą wskazywać na adresy dostępne z przeglądarki użytkownika (`localhost:<port-hosta>`), nie na nazwy serwisów w sieci Docker Compose. Szczegóły w [`CLAUDE.md`](CLAUDE.md).
 
-## Learn More
+## Znane ograniczenia
 
-To learn more about **Refine**, please check out the [Documentation](https://refine.dev/docs)
+Brak autoryzacji — scaffold świadomie bez auth providera. Śledzone w root [`ROADMAP.md`](../ROADMAP.md).
 
-- **Ant Design** [Docs](https://refine.dev/docs/ui-frameworks/antd/tutorial/)
-- **React Router** [Docs](https://refine.dev/docs/core/providers/router-provider/)
-- **REST Data Provider** [Docs](https://refine.dev/docs/core/providers/data-provider/#overview)
+## Stack
 
-## License
-
-MIT
+React 19, TypeScript, Vite, Refine (core + antd + react-router + rest data provider), Ant Design, Puck.

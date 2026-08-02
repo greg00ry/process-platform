@@ -52,6 +52,11 @@ cd htmx
 npm install
 npm start
 
+# panel admina (wymaga dzialajacego htmx z powyzej)
+cd admin
+npm install
+npm run dev
+
 # proces BPMN (wymaga docker compose up -d postgres wiremock kafka mailpit z roota)
 cd operaton
 ./mvnw spring-boot:run
