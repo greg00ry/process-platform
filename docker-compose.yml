@@ -21,7 +21,9 @@ services:
     volumes:
       - ./operaton/src/main/resources/wiremock:/home/wiremock
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/__admin/mappings"]
+      # --spider errors out on this endpoint's chunked (no Content-Length)
+      # response in busybox wget, even though the request itself succeeds.
+      test: ["CMD", "wget", "--quiet", "--tries=1", "-O", "/dev/null", "http://localhost:8080/__admin/mappings"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -91,3 +93,17 @@ services:
         condition: service_healthy
       operaton:
         condition: service_started
+
+  admin:
+    build:
+      context: ./admin
+      args:
+        # Runs in the user's browser, not the compose network - these must
+        # stay reachable from the host, matching the port mappings above.
+        VITE_API_URL: http://localhost:3000/api
+        VITE_WIDGET_BASE_URL: http://localhost:3000
+        VITE_OPERATON_BASE_URL: http://localhost:8080
+    ports:
+      - "8081:3000"
+    depends_on:
+      - htmx

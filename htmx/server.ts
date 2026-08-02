@@ -47,7 +47,7 @@ const submitLimiter = rateLimit({
 const FORMIO_FORMS_DIR = path.join(__dirname, 'data', 'forms-formio');
 const SCHEMA_ID_PATTERN = /^[a-z0-9-]+$/;
 
-app.use(cors({ origin: CORS_ORIGIN }));
+app.use(cors({ origin: CORS_ORIGIN, exposedHeaders: ['X-Total-Count'] }));
 app.use(express.json()); // formio wysyla submit jako JSON
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -138,6 +138,11 @@ async function listSchemaIds(dir: string): Promise<string[]> {
     if ((err as NodeJS.ErrnoException).code === 'ENOENT') return [];
     throw err;
   }
+}
+
+async function deleteSchema(dir: string, schemaId: string): Promise<void> {
+  if (!SCHEMA_ID_PATTERN.test(schemaId)) throw new Error('Nieprawidlowe ID schematu.');
+  await fs.unlink(path.join(dir, `${schemaId}.json`));
 }
 
 // Wymagane pola wyprowadzone ze schematu - walidacja serwerowa nie jest hardkodowana
@@ -257,6 +262,70 @@ app.post('/widget/formio/:schemaId/submit', submitLimiter, async (req: Request<{
   } catch (err) {
     console.error('Blad zapisu zgloszenia (formio):', err);
     res.status(500).json({ ok: false, errors: { _server: 'Błąd serwera, spróbuj ponownie później.' } });
+  }
+});
+
+// --- JSON API dla zewnetrznych paneli admina (np. Refine) ---
+// Konwencja simple-rest (jak json-server): GET listy z _start/_end + naglowek
+// X-Total-Count, GET/PATCH/DELETE pojedynczego zasobu po :id, POST tworzy nowy.
+// UWAGA: jak nizej - brak autoryzacji, to PoC (patrz ROADMAP.md).
+
+app.get('/api/admin/forms', async (req: Request, res: Response) => {
+  const schemaIds = await listSchemaIds(FORMIO_FORMS_DIR);
+  const start = Number(req.query._start ?? 0) || 0;
+  const end = Number(req.query._end ?? schemaIds.length) || schemaIds.length;
+  const page = schemaIds.slice(start, end);
+
+  const items = await Promise.all(
+    page.map(async (id) => {
+      const schema = await loadSchema(FORMIO_FORMS_DIR, id);
+      return {
+        id,
+        componentCount: schema?.components?.length ?? 0,
+        requiredCount: schema ? requiredFieldsFromSchema(schema).length : 0,
+      };
+    })
+  );
+
+  res.set('X-Total-Count', String(schemaIds.length));
+  res.json(items);
+});
+
+app.get('/api/admin/forms/:schemaId', async (req: Request<{ schemaId: string }>, res: Response) => {
+  const schema = await loadSchema(FORMIO_FORMS_DIR, req.params.schemaId);
+  if (!schema) return res.status(404).json({ error: 'Nie znaleziono schematu.' });
+  res.json({ id: req.params.schemaId, ...schema });
+});
+
+app.post('/api/admin/forms', async (req: Request, res: Response) => {
+  const { id, ...schema } = (req.body || {}) as { id?: string } & FormSchema;
+  if (!isNonEmptyString(id) || !SCHEMA_ID_PATTERN.test(id)) {
+    return res.status(400).json({ error: 'Nieprawidlowe lub brakujace ID (male litery, cyfry, myslniki).' });
+  }
+  try {
+    await saveSchema(FORMIO_FORMS_DIR, id, schema as FormSchema);
+    res.status(201).json({ id, ...schema });
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+app.patch('/api/admin/forms/:schemaId', async (req: Request<{ schemaId: string }>, res: Response) => {
+  const { id: _ignored, ...schema } = (req.body || {}) as { id?: string } & FormSchema;
+  try {
+    await saveSchema(FORMIO_FORMS_DIR, req.params.schemaId, schema as FormSchema);
+    res.json({ id: req.params.schemaId, ...schema });
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+app.delete('/api/admin/forms/:schemaId', async (req: Request<{ schemaId: string }>, res: Response) => {
+  try {
+    await deleteSchema(FORMIO_FORMS_DIR, req.params.schemaId);
+    res.json({ id: req.params.schemaId });
+  } catch (err) {
+    res.status(404).json({ error: 'Nie znaleziono schematu.' });
   }
 });
 
