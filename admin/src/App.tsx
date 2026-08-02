@@ -1,9 +1,4 @@
-import {
-  Refine,
-  GitHubBanner,
-  WelcomePage,
-  Authenticated,
-} from "@refinedev/core";
+import { Refine, WelcomePage, Authenticated } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
@@ -25,6 +20,7 @@ import routerProvider, {
   DocumentTitleHandler,
 } from "@refinedev/react-router";
 import { FormList, FormCreate, FormEdit } from "./pages/forms";
+import { PageList, PageEditor, PageRender } from "./pages/pages";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import { Header } from "./components/header";
 import { dataProvider } from "./providers/data";
@@ -32,7 +28,6 @@ import { dataProvider } from "./providers/data";
 function App() {
   return (
     <BrowserRouter>
-      <GitHubBanner />
       <RefineKbarProvider>
         <ColorModeContextProvider>
           <AntdApp>
@@ -49,6 +44,15 @@ function App() {
                     edit: "/forms/edit/:id",
                     meta: {
                       label: "Formularze",
+                      canDelete: true,
+                    },
+                  },
+                  {
+                    name: "admin/pages",
+                    list: "/pages",
+                    edit: "/pages/edit/:id",
+                    meta: {
+                      label: "Strony",
                       canDelete: true,
                     },
                   },
@@ -79,8 +83,14 @@ function App() {
                       <Route path="create" element={<FormCreate />} />
                       <Route path="edit/:id" element={<FormEdit />} />
                     </Route>
+                    <Route path="/pages">
+                      <Route index element={<PageList />} />
+                    </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
+                  {/* Puck (editor i publiczny render) celowo poza ThemedLayout - potrzebuje pelnego ekranu / to widok koncowego usera, nie panelu admina */}
+                  <Route path="/pages/edit/:id" element={<PageEditor />} />
+                  <Route path="/p/:id" element={<PageRender />} />
                 </Routes>
 
                 <RefineKbar />

@@ -17,6 +17,14 @@ interface FormSchema {
   [extra: string]: unknown;
 }
 
+// Puck (page builder) zapisuje strony w tym ksztalcie - traktujemy jak nieprzezroczysty
+// JSON, bez walidacji struktury (renderuje/edytuje to Puck w admin/, nie ten backend).
+interface PageData {
+  content: unknown[];
+  root: unknown;
+  [extra: string]: unknown;
+}
+
 interface SubmissionEntry {
   engine: 'formio';
   schemaId: string;
@@ -45,6 +53,7 @@ const submitLimiter = rateLimit({
 });
 
 const FORMIO_FORMS_DIR = path.join(__dirname, 'data', 'forms-formio');
+const PAGES_DIR = path.join(__dirname, 'data', 'pages');
 const SCHEMA_ID_PATTERN = /^[a-z0-9-]+$/;
 
 app.use(cors({ origin: CORS_ORIGIN, exposedHeaders: ['X-Total-Count'] }));
@@ -114,7 +123,7 @@ window.__loadStyleOnce = window.__loadStyleOnce || function (href) {
 // --- Formularze schema-driven (@formio/js) ---
 // Nowy typ dokumentu = nowy plik JSON w data/forms-formio/, zero nowego kodu.
 
-async function loadSchema(dir: string, schemaId: string): Promise<FormSchema | null> {
+async function loadSchema<T = FormSchema>(dir: string, schemaId: string): Promise<T | null> {
   if (!SCHEMA_ID_PATTERN.test(schemaId)) return null;
   try {
     const raw = await fs.readFile(path.join(dir, `${schemaId}.json`), 'utf-8');
@@ -125,8 +134,9 @@ async function loadSchema(dir: string, schemaId: string): Promise<FormSchema | n
   }
 }
 
-async function saveSchema(dir: string, schemaId: string, schema: FormSchema): Promise<void> {
+async function saveSchema<T>(dir: string, schemaId: string, schema: T): Promise<void> {
   if (!SCHEMA_ID_PATTERN.test(schemaId)) throw new Error('Nieprawidlowe ID schematu.');
+  await fs.mkdir(dir, { recursive: true });
   await fs.writeFile(path.join(dir, `${schemaId}.json`), JSON.stringify(schema, null, 2), 'utf-8');
 }
 
@@ -326,6 +336,64 @@ app.delete('/api/admin/forms/:schemaId', async (req: Request<{ schemaId: string 
     res.json({ id: req.params.schemaId });
   } catch (err) {
     res.status(404).json({ error: 'Nie znaleziono schematu.' });
+  }
+});
+
+// --- JSON API dla stron zbudowanych w Puck (page builder w admin/) ---
+// Ta sama konwencja simple-rest co /api/admin/forms powyzej.
+
+app.get('/api/admin/pages', async (req: Request, res: Response) => {
+  const pageIds = await listSchemaIds(PAGES_DIR);
+  const start = Number(req.query._start ?? 0) || 0;
+  const end = Number(req.query._end ?? pageIds.length) || pageIds.length;
+  const page = pageIds.slice(start, end);
+
+  const items = await Promise.all(
+    page.map(async (id) => {
+      const data = await loadSchema<PageData>(PAGES_DIR, id);
+      return { id, blockCount: data?.content?.length ?? 0 };
+    })
+  );
+
+  res.set('X-Total-Count', String(pageIds.length));
+  res.json(items);
+});
+
+app.get('/api/admin/pages/:pageId', async (req: Request<{ pageId: string }>, res: Response) => {
+  const data = await loadSchema<PageData>(PAGES_DIR, req.params.pageId);
+  if (!data) return res.status(404).json({ error: 'Nie znaleziono strony.' });
+  res.json({ id: req.params.pageId, ...data });
+});
+
+app.post('/api/admin/pages', async (req: Request, res: Response) => {
+  const { id, ...data } = (req.body || {}) as { id?: string } & PageData;
+  if (!isNonEmptyString(id) || !SCHEMA_ID_PATTERN.test(id)) {
+    return res.status(400).json({ error: 'Nieprawidlowe lub brakujace ID (male litery, cyfry, myslniki).' });
+  }
+  try {
+    await saveSchema(PAGES_DIR, id, data as PageData);
+    res.status(201).json({ id, ...data });
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+app.patch('/api/admin/pages/:pageId', async (req: Request<{ pageId: string }>, res: Response) => {
+  const { id: _ignored, ...data } = (req.body || {}) as { id?: string } & PageData;
+  try {
+    await saveSchema(PAGES_DIR, req.params.pageId, data as PageData);
+    res.json({ id: req.params.pageId, ...data });
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+app.delete('/api/admin/pages/:pageId', async (req: Request<{ pageId: string }>, res: Response) => {
+  try {
+    await deleteSchema(PAGES_DIR, req.params.pageId);
+    res.json({ id: req.params.pageId });
+  } catch (err) {
+    res.status(404).json({ error: 'Nie znaleziono strony.' });
   }
 });
 
