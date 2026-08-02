@@ -29,6 +29,19 @@ export const FormList = () => {
           )}
         />
         <Table.Column
+          title="Builder"
+          dataIndex="builder"
+          render={(_, record: BaseRecord) => (
+            <Typography.Link
+              href={`${WIDGET_BASE_URL}/admin/forms/${record.id}/builder`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Otwórz w builderze
+            </Typography.Link>
+          )}
+        />
+        <Table.Column
           title="Akcje"
           dataIndex="actions"
           render={(_, record: BaseRecord) => (
