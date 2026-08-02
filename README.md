@@ -30,7 +30,7 @@ Każdy mikroserwis ma własny top-level folder w monorepo:
 | [`htmx/`](htmx/README.md) | BFF renderujący formularze schema-driven (form.io), osadzany przez htmx w dowolnym frontendzie | Node.js, TypeScript, Express |
 | [`operaton/`](operaton/README.md) | Silnik procesu: triage wniosku kredytowego (credit-score, DMN, routing przez BPMN, human task dla underwritera) | Java 21, Spring Boot, Operaton (BPMN/DMN) |
 | [`ecm-adapter/`](ecm-adapter) | Mikroserwis konsumujący zdarzenia dokumentowe z Kafki i przekazujący je do ECM | Go |
-| [`admin/`](admin) | Panel admina: zarządzanie schematami formularzy (form.io) + linki do gotowych Cockpit/Tasklist Operatona | React, Refine, Ant Design |
+| [`admin/`](admin) | Panel admina: zarządzanie schematami formularzy (form.io), page builder (Puck) do składania stron z prawdziwych komponentów platformy, linki do gotowych Cockpit/Tasklist Operatona | React, Refine, Ant Design, Puck |
 
 ## Uruchomienie
 
