@@ -45,13 +45,13 @@ export const config: Config<Props, RootProps> = {
       defaultProps: { text: "Naglowek", level: "h2" },
       render: ({ text, level }) => {
         const Tag = level;
-        return <Tag>{text}</Tag>;
+        return <Tag style={{ color: "#111" }}>{text}</Tag>;
       },
     },
     TextBlock: {
       fields: { text: { type: "textarea" } },
       defaultProps: { text: "Tresc akapitu." },
-      render: ({ text }) => <p style={{ lineHeight: 1.6 }}>{text}</p>,
+      render: ({ text }) => <p style={{ lineHeight: 1.6, color: "#111" }}>{text}</p>,
     },
     ImageBlock: {
       fields: { src: { type: "text" }, alt: { type: "text" } },
@@ -114,8 +114,8 @@ export const config: Config<Props, RootProps> = {
       fields: { title: { type: "text" }, content: { type: "slot" } },
       defaultProps: { title: "Tytul karty" },
       render: ({ title, content: Content }) => (
-        <div style={{ border: "1px solid #e0e0e0", borderRadius: 8, padding: "1.25rem" }}>
-          <h3 style={{ marginTop: 0 }}>{title}</h3>
+        <div style={{ border: "1px solid #e0e0e0", borderRadius: 8, padding: "1.25rem", background: "#fff" }}>
+          <h3 style={{ marginTop: 0, color: "#111" }}>{title}</h3>
           {Content && <Content />}
         </div>
       ),

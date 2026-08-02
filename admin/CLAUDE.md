@@ -8,7 +8,7 @@ React + [Refine](https://refine.dev) + Ant Design, scaffoldowane przez `create-r
 
 ## Gotcha: publiczne trasy (`/p/:id`) dziedzicza dark theme panelu
 
-`<Puck>` (edytor) renderuje canvas w iframe, wiec jest odizolowany od stylow hosta. `<Render>` (publiczny podglad) — nie, renderuje wprost do DOM panelu, wiec dziedziczy ciemny motyw (biały tekst na białym tle bez fixu). `pages/render.tsx` resetuje `background`/`color` recznie — pamietaj o tym przy kazdej nowej trasie, ktora ma wygladac jak "prawdziwa strona", nie panel admina.
+`<Puck>` (edytor) renderuje canvas w iframe, wiec jest odizolowany od stylow hosta. `<Render>` (publiczny podglad) — nie, renderuje wprost do DOM panelu, wiec dziedziczy ciemny motyw (biały tekst na białym tle bez fixu). `pages/render.tsx` resetuje `background`/`color` recznie na poziomie wrappera — dodatkowo kazdy komponent w `puck/config.tsx` ma teraz **wlasny** jawny `color` (nie polega tylko na dziedziczeniu), zeby byl samowystarczalny niezaleznie od tego gdzie `<Render>` zostanie kiedys uzyty (np. inny podglad, eksport). Dodajac nowy komponent z tekstem — ustaw mu kolor jawnie, nie zakladaj kontekstu.
 
 ## Data provider = konwencja simple-rest
 
